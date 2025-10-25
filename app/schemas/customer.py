@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional
 from datetime import datetime
+import re
 
 class CustomerCreate(BaseModel):
     name: str
@@ -15,6 +16,13 @@ class CustomerCreate(BaseModel):
     def age_must_be_valid(cls, v):
         if v < 18:
             raise ValueError('Age must be at least 18')
+        return v
+
+    @field_validator('phone')
+    @classmethod
+    def phone_must_be_valid(cls, v):
+        if v is not None and not re.match(r'^\+?1?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$', v):
+            raise ValueError('Phone number must be in valid format (e.g., +1-123-456-7890 or 1234567890)')
         return v
 
 class CustomerLogin(BaseModel):

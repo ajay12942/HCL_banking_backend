@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 class Token(BaseModel):
@@ -6,10 +6,10 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
     is_admin: bool = False
 
 class LoginRequest(BaseModel):
-    email: str
+    email: EmailStr
     password: str
     is_admin: bool = False

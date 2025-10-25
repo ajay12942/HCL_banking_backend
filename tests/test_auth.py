@@ -100,6 +100,30 @@ def test_customer_registration_age_validation(client):
     response = client.post("/auth/register", json=customer_data)
     assert response.status_code == 422  # Validation error
 
+def test_customer_registration_phone_validation(client):
+    """Test phone validation in registration."""
+    customer_data = {
+        "name": "Test User",
+        "email": "test@example.com",
+        "password": "password123",
+        "age": 25,
+        "phone": "invalid-phone"
+    }
+    response = client.post("/auth/register", json=customer_data)
+    assert response.status_code == 422  # Validation error
+    assert "Phone number must be in valid format" in str(response.json())
+
+def test_customer_registration_email_validation(client):
+    """Test email validation in registration."""
+    customer_data = {
+        "name": "Test User",
+        "email": "invalid-email",
+        "password": "password123",
+        "age": 25
+    }
+    response = client.post("/auth/register", json=customer_data)
+    assert response.status_code == 422  # Validation error
+
 def test_customer_login(client, test_customer):
     """Test customer login."""
     response = client.post("/auth/token", data={
