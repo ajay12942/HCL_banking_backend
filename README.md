@@ -30,7 +30,7 @@ The objective is to build the Modular Banking Backend System
 
 ## Tech stack planning to use 
 * FastAPI (Python web framework for building APIs)
-* PostgreSQL (relational database)
+* SQLite (relational database - used for development simplicity)
 * SQLAlchemy (ORM for database interaction)
 * JWT/OAuth2 (authentication, supported by FastAPI)
 * Swagger UI (auto-generated API documentation and testing interface from FastAPI)
@@ -125,3 +125,7 @@ No direct relationship between BankAdmin and Loans (admins manage all loans via 
 
 # Startup to start the server
  >  uvicorn app.main:app --reload
+
+# Testing
+To run the unit tests with coverage:
+ > pytest --cov=app --cov-report=term-missing

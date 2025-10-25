@@ -5,6 +5,7 @@ psycopg2-binary
 python-jose[cryptography]
 passlib[bcrypt]
 pytest
+pytest-cov
 alembic
 httpx
 python-multipart
