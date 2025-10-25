@@ -5,6 +5,7 @@ from ..database import get_db
 from ..models import Customer, BankAdmin
 from ..schemas.customer import CustomerCreate, CustomerResponse
 from ..schemas.auth import LoginRequest, Token
+from fastapi.security import OAuth2PasswordRequestForm
 from ..auth import get_password_hash, verify_password, create_access_token
 from ..config import settings
 
@@ -32,21 +33,24 @@ def register_customer(customer: CustomerCreate, db: Session = Depends(get_db)):
     return db_customer
 
 @router.post("/token", response_model=Token)
-def login_for_access_token(form_data: LoginRequest, db: Session = Depends(get_db)):
-    if form_data.is_admin:
-        user = db.query(BankAdmin).filter(BankAdmin.email == form_data.email).first()
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # Determine if admin based on username
+    is_admin = form_data.username == "admin@example.com"
+    
+    if is_admin:
+        user = db.query(BankAdmin).filter(BankAdmin.email == form_data.username).first()
     else:
-        user = db.query(Customer).filter(Customer.email == form_data.email).first()
+        user = db.query(Customer).filter(Customer.email == form_data.username).first()
     
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
-        data={"sub": user.email, "is_admin": form_data.is_admin}, expires_delta=access_token_expires
+        data={"sub": user.email, "is_admin": is_admin}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
